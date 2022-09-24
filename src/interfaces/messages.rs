@@ -9,7 +9,7 @@ macro_rules! prompt {
     };
 }
 
-pub(super) const SELECT_POINTER: &'static str = "*";
+pub(super) const SELECT_POINTER: &str = "*";
 
 pub(super) fn whitespace_with_width(width: usize) -> String {
     format!("{: ^1$}", "", width)

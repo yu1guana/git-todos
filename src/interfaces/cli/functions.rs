@@ -1,10 +1,11 @@
 // Copyright (c) 2022 Yuichi Ishida <yu1guana@gmail.com>
 
+use crate::error::InterfaceError;
 use crate::interfaces::messages;
 use crate::interfaces::messages::SELECT_POINTER;
 use crate::interfaces::preferences::Preferences;
 use crate::todo::{TodoEntry, TodoList};
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use chrono::Utc;
 use std::io;
 use std::io::{Stdout, Write};
@@ -63,7 +64,35 @@ pub(crate) fn remove(preferences: Preferences, todos_file_path: PathBuf) -> Resu
     Ok(())
 }
 
-pub(crate) fn finish(preferences: Preferences, todos_file_path: PathBuf) -> Result<()> {
+pub(crate) fn edit(preferences: Preferences, todos_file_path: PathBuf) -> Result<()> {
+    if todos_file_path.is_file() {
+        let mut todo_list = TodoList::read_file(&todos_file_path)?;
+        if todo_list.todos().is_empty() {
+            println!("{}", messages::todo_list_is_empty(&preferences));
+        } else {
+            let target_id = select(&preferences, todo_list.todos())?;
+            let mut target_todo_entry = todo_list.todos_mut().remove(target_id);
+            println!("{}", target_todo_entry.title());
+            target_todo_entry.set_description(one_line_reader(
+                false,
+                messages::description_in_add_command(&preferences),
+            )?);
+            target_todo_entry.set_updated_utc_datetime_rfc3339(Utc::now().to_rfc3339());
+            todo_list.push(target_todo_entry);
+            todo_list.write_file(&todos_file_path)?;
+        }
+    } else {
+        println!("{}", messages::no_todo_list(&preferences));
+    }
+    Ok(())
+}
+
+pub(crate) fn finish(
+    _preferences: Preferences,
+    git_repository_path: PathBuf,
+    _todos_file_path: PathBuf,
+) -> Result<()> {
+    let _git_repository = git2::Repository::open(git_repository_path)?;
     unimplemented!();
     Ok(())
 }
@@ -74,12 +103,14 @@ pub(crate) fn show(preferences: Preferences, todos_file_path: PathBuf) -> Result
         if todo_list.todos().is_empty() {
             println!("{}", messages::todo_list_is_empty(&preferences));
         } else {
-            let show_id = select(&preferences, todo_list.todos())?;
-            let title = todo_list.todos().get(show_id).unwrap().title();
-            let description = todo_list.todos().get(show_id).unwrap().description();
-            println!("[{}]", title);
-            println!("");
-            println!("{}", description);
+            let target_id = select(&preferences, todo_list.todos())?;
+            let target_entry = todo_list.todos().get(target_id).unwrap();
+            println!(
+                "[{}] {}",
+                target_entry.title(),
+                target_entry.updated_datetime()?
+            );
+            println!("{}", target_entry.description());
         }
     } else {
         println!("{}", messages::no_todo_list(&preferences));
@@ -100,7 +131,7 @@ fn one_line_reader(necessary: bool, prompt_message: &str) -> Result<String> {
                 if necessary && s.is_empty() {
                     continue;
                 } else {
-                    write!(stdout, "\n")?;
+                    writeln!(stdout)?;
                     write!(
                         stdout,
                         "{}",
@@ -132,7 +163,7 @@ fn one_line_reader(necessary: bool, prompt_message: &str) -> Result<String> {
                 write!(stdout, "{}{}", prompt_message, s)?;
                 stdout.flush()?;
             }
-            Ok(Key::Ctrl('c')) => return Err(anyhow!("Keyboard interrupted")),
+            Ok(Key::Ctrl('c')) => return Err(InterfaceError::KeyboardInterrupted.into()),
             _ => {}
         }
     }
@@ -157,7 +188,7 @@ fn select(preferences: &Preferences, todos: &[TodoEntry]) -> Result<usize> {
         if termion::terminal_size()? != terminal_size {
             write!(stdout, "{}", cursor::Left(u16::MAX))?;
             write!(stdout, "{}", cursor::Show)?;
-            return Err(anyhow!("Terminal size is changed in operations"));
+            return Err(InterfaceError::TerminalResizing.into());
         }
         match key {
             Ok(Key::Char('\n')) => break,
@@ -173,7 +204,7 @@ fn select(preferences: &Preferences, todos: &[TodoEntry]) -> Result<usize> {
                 write!(stdout, "{}", cursor::Show)?;
                 write!(stdout, "{}", cursor::Left(u16::MAX))?;
                 stdout.flush()?;
-                return Err(anyhow!("Keyboard interrupted"));
+                return Err(InterfaceError::KeyboardInterrupted.into());
             }
             _ => {}
         }
@@ -190,7 +221,7 @@ fn title_list_lines(select_id: Option<usize>, todos: &[TodoEntry]) -> Result<Vec
     let (terminal_width, _) = termion::terminal_size()?;
     let indent = messages::whitespace_with_width(SELECT_POINTER.width_cjk());
     let mut lines = vec![];
-    for (i_todo, todo) in todos.into_iter().enumerate() {
+    for (i_todo, todo) in todos.iter().enumerate() {
         lines.push(match select_id {
             Some(id) => {
                 if i_todo == id {
@@ -202,7 +233,7 @@ fn title_list_lines(select_id: Option<usize>, todos: &[TodoEntry]) -> Result<Vec
             None => messages::title_entry_head(&indent, Some(i_todo)),
         });
         if lines.last().unwrap().width_cjk() > (terminal_width - 5) as usize {
-            return Err(anyhow!("terminal window is too small"));
+            return Err(InterfaceError::TooSmallTerminal.into());
         }
         for c in todo.title().chars() {
             lines.last_mut().unwrap().push(c);

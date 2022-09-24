@@ -1,5 +1,6 @@
 // Copyright (c) 2022 Yuichi Ishida <yu1guana@gmail.com>
 
+mod error;
 mod interfaces;
 mod todo;
 

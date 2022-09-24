@@ -13,31 +13,38 @@ Action	interfaces/cli/body.rs	/^enum Action {$/;"	g
 Add	interfaces/cli/body.rs	/^    Add,$/;"	e	enum:Action
 Cli	interfaces/cli/body.rs	/^impl Cli {$/;"	c
 Cli	interfaces/cli/body.rs	/^pub(crate) struct Cli {$/;"	s
+Edit	interfaces/cli/body.rs	/^    Edit,$/;"	e	enum:Action
 English	interfaces/preferences/language.rs	/^    English,$/;"	e	enum:Language
 Finish	interfaces/cli/body.rs	/^    Finish,$/;"	e	enum:Action
-Import	interfaces/cli/body.rs	/^    Import,$/;"	e	enum:Action
+InterfaceError	error.rs	/^pub enum InterfaceError {$/;"	g
 Japanese	interfaces/preferences/language.rs	/^    Japanese,$/;"	e	enum:Language
+KeyboardInterrupted	error.rs	/^    KeyboardInterrupted,$/;"	e	enum:InterfaceError
 Language	interfaces/preferences/language.rs	/^impl Default for Language {$/;"	c
 Language	interfaces/preferences/language.rs	/^pub(crate) enum Language {$/;"	g
 List	interfaces/cli/body.rs	/^    List,$/;"	e	enum:Action
-Mark	interfaces/cli/body.rs	/^    Mark,$/;"	e	enum:Action
+NotGitRepository	error.rs	/^    NotGitRepository,$/;"	e	enum:InterfaceError
 Preferences	interfaces/preferences/body.rs	/^pub(crate) struct Preferences {$/;"	s
 Remove	interfaces/cli/body.rs	/^    Remove,$/;"	e	enum:Action
 Show	interfaces/cli/body.rs	/^    Show,$/;"	e	enum:Action
+TerminalResizing	error.rs	/^    TerminalResizing,$/;"	e	enum:InterfaceError
 TodoEntry	todo/entry.rs	/^impl TodoEntry {$/;"	c
 TodoEntry	todo/entry.rs	/^pub(crate) struct TodoEntry {$/;"	s
 TodoList	todo/list.rs	/^impl TodoList {$/;"	c
 TodoList	todo/list.rs	/^pub(crate) struct TodoList {$/;"	s
+TooSmallTerminal	error.rs	/^    TooSmallTerminal,$/;"	e	enum:InterfaceError
 action	interfaces/cli/body.rs	/^    action: Action,$/;"	m	struct:Cli
 add	interfaces/cli/functions.rs	/^pub(crate) fn add(preferences: Preferences, todos_file_path: PathBuf) -> Result<()> {$/;"	f
 body	interfaces/cli.rs	/^mod body;$/;"	n
 body	interfaces/preferences.rs	/^mod body;$/;"	n
+clear_upper_lines	interfaces/cli/functions.rs	/^fn clear_upper_lines(stdout: &mut RawTerminal<Stdout>, num_row: usize) -> Result<()> {$/;"	f
 cli	interfaces.rs	/^pub(crate) mod cli;$/;"	n
 default	interfaces/preferences/language.rs	/^    fn default() -> Self {$/;"	P	implementation:Language
 description	todo/entry.rs	/^    description: String,$/;"	m	struct:TodoEntry
 description_in_add_command	interfaces/messages.rs	/^pub(super) fn description_in_add_command(preferences: &Preferences) -> &'static str {$/;"	f
+edit	interfaces/cli/functions.rs	/^pub(crate) fn edit(preferences: Preferences, todos_file_path: PathBuf) -> Result<()> {$/;"	f
 entry	todo.rs	/^pub(crate) mod entry;$/;"	n
-finish	interfaces/cli/functions.rs	/^pub(crate) fn finish(preferences: Preferences, todos_file_path: PathBuf) -> Result<()> {$/;"	f
+error	main.rs	/^mod error;$/;"	n
+finish	interfaces/cli/functions.rs	/^pub(crate) fn finish($/;"	f
 functions	interfaces/cli.rs	/^mod functions;$/;"	n
 interfaces	main.rs	/^mod interfaces;$/;"	n
 language	interfaces/preferences.rs	/^mod language;$/;"	n
@@ -46,26 +53,30 @@ list	interfaces/cli/functions.rs	/^pub(crate) fn list(preferences: Preferences, 
 list	todo.rs	/^pub(crate) mod list;$/;"	n
 main	main.rs	/^fn main() -> Result<()> {$/;"	f
 messages	interfaces.rs	/^mod messages;$/;"	n
-new	todo/entry.rs	/^    pub(crate) fn new($/;"	P	implementation:TodoEntry
+names	interfaces.rs	/^mod names;$/;"	n
 new	todo/list.rs	/^    pub(crate) fn new() -> Self {$/;"	P	implementation:TodoList
 no_todo_list	interfaces/messages.rs	/^pub(super) fn no_todo_list(preferences: &Preferences) -> &'static str {$/;"	f
 one_line_reader	interfaces/cli/functions.rs	/^fn one_line_reader(necessary: bool, prompt_message: &str) -> Result<String> {$/;"	f
+please_select_todo	interfaces/messages.rs	/^pub(super) fn please_select_todo(preferences: &Preferences) -> &'static str {$/;"	f
 preferences	interfaces.rs	/^mod preferences;$/;"	n
 prompt	interfaces/messages.rs	/^macro_rules! prompt {$/;"	M
 push	todo/list.rs	/^    pub(crate) fn push(&mut self, todo_entry: TodoEntry) {$/;"	P	implementation:TodoList
 read_file	todo/list.rs	/^    pub(crate) fn read_file(file_path: &Path) -> Result<Self> {$/;"	P	implementation:TodoList
 remove	interfaces/cli/functions.rs	/^pub(crate) fn remove(preferences: Preferences, todos_file_path: PathBuf) -> Result<()> {$/;"	f
 run	interfaces/cli/body.rs	/^    pub(crate) fn run() -> Result<()> {$/;"	P	implementation:Cli
-search_todos_file_path	interfaces/cli/body.rs	/^    fn search_todos_file_path() -> Result<PathBuf> {$/;"	P	implementation:Cli
-select	interfaces/cli/functions.rs	/^fn select(todos: &[TodoEntry]) -> Result<usize> {$/;"	f
+select	interfaces/cli/functions.rs	/^fn select(preferences: &Preferences, todos: &[TodoEntry]) -> Result<usize> {$/;"	f
+serach_repository_path	interfaces/cli/body.rs	/^    fn serach_repository_path() -> Result<PathBuf> {$/;"	P	implementation:Cli
 show	interfaces/cli/functions.rs	/^pub(crate) fn show(preferences: Preferences, todos_file_path: PathBuf) -> Result<()> {$/;"	f
-str	interfaces/messages.rs	/^pub(super) const SELECT_POINTER: &'static str = "*";$/;"	v
 title	todo/entry.rs	/^    title: String,$/;"	m	struct:TodoEntry
-title_entry	interfaces/messages.rs	/^pub(super) fn title_entry(head: &str, idx: usize, title: &str) -> String {$/;"	f
+title_entry_head	interfaces/messages.rs	/^pub(super) fn title_entry_head(pointer: &str, idx: Option<usize>) -> String {$/;"	f
 title_in_add_command	interfaces/messages.rs	/^pub(super) fn title_in_add_command(preferences: &Preferences) -> &'static str {$/;"	f
+title_list_lines	interfaces/cli/functions.rs	/^fn title_list_lines(select_id: Option<usize>, todos: &[TodoEntry]) -> Result<Vec<String>> {$/;"	f
 todo	main.rs	/^mod todo;$/;"	n
+todo_entry_is_removed	interfaces/messages.rs	/^pub(super) fn todo_entry_is_removed(preferences: &Preferences) -> &'static str {$/;"	f
 todo_list_is_empty	interfaces/messages.rs	/^pub(super) fn todo_list_is_empty(preferences: &Preferences) -> &'static str {$/;"	f
-todos	todo/list.rs	/^    todos: Option<Vec<TodoEntry>>,$/;"	m	struct:TodoList
+todos	todo/list.rs	/^    todos: Vec<TodoEntry>,$/;"	m	struct:TodoList
+updated_datetime	todo/entry.rs	/^    pub(crate) fn updated_datetime(&self) -> Result<String> {$/;"	P	implementation:TodoEntry
 updated_utc_datetime_rfc3339	todo/entry.rs	/^    updated_utc_datetime_rfc3339: String,$/;"	m	struct:TodoEntry
 whitespace_with_width	interfaces/messages.rs	/^pub(super) fn whitespace_with_width(width: usize) -> String {$/;"	f
 write_file	todo/list.rs	/^    pub(crate) fn write_file(&self, file_path: &Path) -> Result<()> {$/;"	P	implementation:TodoList
+write_title_list	interfaces/cli/functions.rs	/^fn write_title_list($/;"	f

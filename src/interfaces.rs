@@ -2,4 +2,5 @@
 
 pub(crate) mod cli;
 mod messages;
+mod names;
 mod preferences;

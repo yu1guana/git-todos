@@ -10,7 +10,9 @@ publish = false
 anyhow = "1.0"
 chrono = "0.4"
 clap = {version = "3.1", features = ["derive"]}
+derive-new = "0.5"
 getset = "0.1"
+git2 = "0.15"
 serde="1.0"
 serde_derive = "1.0"
 sys-locale = "0.2"
