@@ -29,6 +29,20 @@ pub(super) fn no_todo_list(preferences: &Preferences) -> &'static str {
     }
 }
 
+pub(super) fn todo_entry_is_removed(preferences: &Preferences) -> &'static str {
+    match preferences.language() {
+        Language::English => "The following todos are removed:",
+        Language::Japanese => "以下のTODOが削除されました:",
+    }
+}
+
+pub(super) fn please_select_todo(preferences: &Preferences) -> &'static str {
+    match preferences.language() {
+        Language::English => "Select a To-Do (use Up and Down keys)",
+        Language::Japanese => "上下の矢印キーを利用してTODOを選んでください",
+    }
+}
+
 pub(super) fn todo_list_is_empty(preferences: &Preferences) -> &'static str {
     match preferences.language() {
         Language::English => "a To-Do list is empty",

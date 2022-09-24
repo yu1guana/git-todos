@@ -13,12 +13,12 @@ use toml;
 #[derive(Debug, Serialize, Deserialize, Getters, MutGetters)]
 #[getset(get = "pub(crate)", get_mut = "pub(crate)")]
 pub(crate) struct TodoList {
-    todos: Option<Vec<TodoEntry>>,
+    todos: Vec<TodoEntry>,
 }
 
 impl TodoList {
     pub(crate) fn new() -> Self {
-        Self { todos: None }
+        Self { todos: Vec::new() }
     }
     pub(crate) fn read_file(file_path: &Path) -> Result<Self> {
         let file_contents = fs::read_to_string(file_path)
@@ -41,11 +41,6 @@ impl TodoList {
         Ok(())
     }
     pub(crate) fn push(&mut self, todo_entry: TodoEntry) {
-        match &mut self.todos {
-            Some(todos) => todos.push(todo_entry),
-            None => {
-                self.todos = Some(vec![todo_entry]);
-            }
-        }
+        self.todos.push(todo_entry);
     }
 }

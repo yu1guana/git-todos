@@ -14,11 +14,6 @@ description = "richな編集ができるtuiを作成する"
 updated_utc_datetime_rfc3339 = "2022-08-27T04:08:47.269182+00:00"
 
 [[todos]]
-title = "show関数の作成"
-description = "ToDoの詳細を表示する関数を作成する"
-updated_utc_datetime_rfc3339 = "2022-08-27T04:09:44.372919+00:00"
-
-[[todos]]
 title = "finish関数の作成"
 description = "git todos finishを呼び出すことでcommitをできるようにする"
 updated_utc_datetime_rfc3339 = "2022-08-27T04:12:29.052678+00:00"

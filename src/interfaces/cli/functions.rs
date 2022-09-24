@@ -19,15 +19,11 @@ use unicode_width::UnicodeWidthStr;
 pub(crate) fn list(preferences: Preferences, todos_file_path: PathBuf) -> Result<()> {
     if todos_file_path.is_file() {
         let todo_list = TodoList::read_file(&todos_file_path)?;
-        if let Some(todos) = todo_list.todos() {
-            if todos.is_empty() {
-                println!("{}", messages::todo_list_is_empty(&preferences));
-            } else {
-                let mut stdout = io::stdout().into_raw_mode()?;
-                write_title_list(&mut stdout, None, todos)?;
-            }
-        } else {
+        if todo_list.todos().is_empty() {
             println!("{}", messages::todo_list_is_empty(&preferences));
+        } else {
+            let mut stdout = io::stdout().into_raw_mode()?;
+            write_title_list(&mut stdout, None, todo_list.todos())?;
         }
     } else {
         println!("{}", messages::no_todo_list(&preferences));
@@ -52,16 +48,14 @@ pub(crate) fn add(preferences: Preferences, todos_file_path: PathBuf) -> Result<
 pub(crate) fn remove(preferences: Preferences, todos_file_path: PathBuf) -> Result<()> {
     if todos_file_path.is_file() {
         let mut todo_list = TodoList::read_file(&todos_file_path)?;
-        if let Some(todos) = todo_list.todos_mut() {
-            if todos.is_empty() {
-                println!("{}", messages::todo_list_is_empty(&preferences));
-            } else {
-                let remove_id = select(&todos)?;
-                todos.remove(remove_id);
-                todo_list.write_file(&todos_file_path)?;
-            }
-        } else {
+        if todo_list.todos().is_empty() {
             println!("{}", messages::todo_list_is_empty(&preferences));
+        } else {
+            let remove_id = select(&preferences, todo_list.todos())?;
+            let removed_todo_entry = todo_list.todos_mut().remove(remove_id);
+            todo_list.write_file(&todos_file_path)?;
+            println!("{}", messages::todo_entry_is_removed(&preferences),);
+            println!("{}", removed_todo_entry.title());
         }
     } else {
         println!("{}", messages::no_todo_list(&preferences));
@@ -75,7 +69,21 @@ pub(crate) fn finish(preferences: Preferences, todos_file_path: PathBuf) -> Resu
 }
 
 pub(crate) fn show(preferences: Preferences, todos_file_path: PathBuf) -> Result<()> {
-    unimplemented!();
+    if todos_file_path.is_file() {
+        let todo_list = TodoList::read_file(&todos_file_path)?;
+        if todo_list.todos().is_empty() {
+            println!("{}", messages::todo_list_is_empty(&preferences));
+        } else {
+            let show_id = select(&preferences, todo_list.todos())?;
+            let title = todo_list.todos().get(show_id).unwrap().title();
+            let description = todo_list.todos().get(show_id).unwrap().description();
+            println!("[{}]", title);
+            println!("");
+            println!("{}", description);
+        }
+    } else {
+        println!("{}", messages::no_todo_list(&preferences));
+    }
     Ok(())
 }
 
@@ -131,13 +139,19 @@ fn one_line_reader(necessary: bool, prompt_message: &str) -> Result<String> {
     Ok(s)
 }
 
-fn select(todos: &[TodoEntry]) -> Result<usize> {
+fn select(preferences: &Preferences, todos: &[TodoEntry]) -> Result<usize> {
     let terminal_size = termion::terminal_size()?;
     let mut select_id = 0;
     let stdin = io::stdin();
     let mut stdout = io::stdout().into_raw_mode()?;
     let num_row = title_list_lines(Some(select_id), todos)?.len();
     write!(stdout, "{}", cursor::Hide)?;
+    writeln!(
+        stdout,
+        "{}{}",
+        messages::please_select_todo(preferences),
+        cursor::Left(u16::MAX)
+    )?;
     write_title_list(&mut stdout, Some(select_id), todos)?;
     for key in stdin.keys() {
         if termion::terminal_size()? != terminal_size {
@@ -167,6 +181,7 @@ fn select(todos: &[TodoEntry]) -> Result<usize> {
         write_title_list(&mut stdout, Some(select_id), todos)?;
     }
     write!(stdout, "{}", cursor::Show)?;
+    clear_upper_lines(&mut stdout, num_row + 1)?;
     stdout.flush()?;
     Ok(select_id)
 }
