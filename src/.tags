@@ -16,13 +16,16 @@ Cli	interfaces/cli/body.rs	/^pub(crate) struct Cli {$/;"	s
 Edit	interfaces/cli/body.rs	/^    Edit,$/;"	e	enum:Action
 English	interfaces/preferences/language.rs	/^    English,$/;"	e	enum:Language
 Finish	interfaces/cli/body.rs	/^    Finish,$/;"	e	enum:Action
-InterfaceError	error.rs	/^pub enum InterfaceError {$/;"	g
+GitAdd	error.rs	/^    GitAdd,$/;"	e	enum:GitError
+GitCommit	error.rs	/^    GitCommit,$/;"	e	enum:GitError
+GitError	error.rs	/^pub(crate) enum GitError {$/;"	g
+InterfaceError	error.rs	/^pub(crate) enum InterfaceError {$/;"	g
 Japanese	interfaces/preferences/language.rs	/^    Japanese,$/;"	e	enum:Language
 KeyboardInterrupted	error.rs	/^    KeyboardInterrupted,$/;"	e	enum:InterfaceError
 Language	interfaces/preferences/language.rs	/^impl Default for Language {$/;"	c
 Language	interfaces/preferences/language.rs	/^pub(crate) enum Language {$/;"	g
 List	interfaces/cli/body.rs	/^    List,$/;"	e	enum:Action
-NotGitRepository	error.rs	/^    NotGitRepository,$/;"	e	enum:InterfaceError
+NotGitRepository	error.rs	/^    NotGitRepository,$/;"	e	enum:GitError
 Preferences	interfaces/preferences/body.rs	/^pub(crate) struct Preferences {$/;"	s
 Remove	interfaces/cli/body.rs	/^    Remove,$/;"	e	enum:Action
 Show	interfaces/cli/body.rs	/^    Show,$/;"	e	enum:Action
@@ -36,47 +39,65 @@ action	interfaces/cli/body.rs	/^    action: Action,$/;"	m	struct:Cli
 add	interfaces/cli/functions.rs	/^pub(crate) fn add(preferences: Preferences, todos_file_path: PathBuf) -> Result<()> {$/;"	f
 body	interfaces/cli.rs	/^mod body;$/;"	n
 body	interfaces/preferences.rs	/^mod body;$/;"	n
+change_type_in_finish_command	interfaces/common/messages.rs	/^pub(crate) fn change_type_in_finish_command(preferences: &Preferences) -> &'static str {$/;"	f
 clear_upper_lines	interfaces/cli/functions.rs	/^fn clear_upper_lines(stdout: &mut RawTerminal<Stdout>, num_row: usize) -> Result<()> {$/;"	f
 cli	interfaces.rs	/^pub(crate) mod cli;$/;"	n
+comfirmation_prompt	interfaces/common/messages.rs	/^pub(crate) fn comfirmation_prompt(preferences: &Preferences) -> &'static str {$/;"	f
+commit_is_done	interfaces/common/messages.rs	/^pub(crate) fn commit_is_done(preferences: &Preferences) -> &'static str {$/;"	f
+common	interfaces.rs	/^mod common;$/;"	n
+confirm	interfaces/cli/functions.rs	/^fn confirm(preferences: &Preferences) -> Result<bool> {$/;"	f
 default	interfaces/preferences/language.rs	/^    fn default() -> Self {$/;"	P	implementation:Language
+description	interfaces/common/messages.rs	/^pub(crate) fn description(preferences: &Preferences) -> &'static str {$/;"	f
 description	todo/entry.rs	/^    description: String,$/;"	m	struct:TodoEntry
-description_in_add_command	interfaces/messages.rs	/^pub(super) fn description_in_add_command(preferences: &Preferences) -> &'static str {$/;"	f
+description_in_add_command	interfaces/common/messages.rs	/^pub(crate) fn description_in_add_command(preferences: &Preferences) -> &'static str {$/;"	f
 edit	interfaces/cli/functions.rs	/^pub(crate) fn edit(preferences: Preferences, todos_file_path: PathBuf) -> Result<()> {$/;"	f
 entry	todo.rs	/^pub(crate) mod entry;$/;"	n
 error	main.rs	/^mod error;$/;"	n
-finish	interfaces/cli/functions.rs	/^pub(crate) fn finish($/;"	f
+finish	interfaces/cli/functions.rs	/^pub(crate) fn finish(preferences: Preferences, todos_file_path: PathBuf) -> Result<()> {$/;"	f
 functions	interfaces/cli.rs	/^mod functions;$/;"	n
 interfaces	main.rs	/^mod interfaces;$/;"	n
 language	interfaces/preferences.rs	/^mod language;$/;"	n
 language	interfaces/preferences/body.rs	/^    language: Language,$/;"	m	struct:Preferences
+last_update	interfaces/common/messages.rs	/^pub(crate) fn last_update(preferences: &Preferences) -> &'static str {$/;"	f
 list	interfaces/cli/functions.rs	/^pub(crate) fn list(preferences: Preferences, todos_file_path: PathBuf) -> Result<()> {$/;"	f
 list	todo.rs	/^pub(crate) mod list;$/;"	n
+long_description_in_finish_command	interfaces/common/messages.rs	/^pub(crate) fn long_description_in_finish_command(preferences: &Preferences) -> &'static str {$/;"	f
 main	main.rs	/^fn main() -> Result<()> {$/;"	f
-messages	interfaces.rs	/^mod messages;$/;"	n
-names	interfaces.rs	/^mod names;$/;"	n
+make_commit_message	interfaces/common/utilities.rs	/^pub(crate) fn make_commit_message($/;"	f
+messages	interfaces/common.rs	/^pub(super) mod messages;$/;"	n
+names	interfaces/common.rs	/^pub(super) mod names;$/;"	n
 new	todo/list.rs	/^    pub(crate) fn new() -> Self {$/;"	P	implementation:TodoList
-no_todo_list	interfaces/messages.rs	/^pub(super) fn no_todo_list(preferences: &Preferences) -> &'static str {$/;"	f
+no_todo_list	interfaces/common/messages.rs	/^pub(crate) fn no_todo_list(preferences: &Preferences) -> &'static str {$/;"	f
 one_line_reader	interfaces/cli/functions.rs	/^fn one_line_reader(necessary: bool, prompt_message: &str) -> Result<String> {$/;"	f
-please_select_todo	interfaces/messages.rs	/^pub(super) fn please_select_todo(preferences: &Preferences) -> &'static str {$/;"	f
+please_select_todo	interfaces/common/messages.rs	/^pub(crate) fn please_select_todo(preferences: &Preferences) -> &'static str {$/;"	f
 preferences	interfaces.rs	/^mod preferences;$/;"	n
-prompt	interfaces/messages.rs	/^macro_rules! prompt {$/;"	M
+print_commit_message_format_with_box	interfaces/common/utilities.rs	/^pub(crate) fn print_commit_message_format_with_box() {$/;"	f
+print_commit_message_with_box	interfaces/common/utilities.rs	/^pub(crate) fn print_commit_message_with_box(box_title: &str, commit_message: &str) {$/;"	f
+prompt	interfaces/common/messages.rs	/^macro_rules! prompt {$/;"	M
 push	todo/list.rs	/^    pub(crate) fn push(&mut self, todo_entry: TodoEntry) {$/;"	P	implementation:TodoList
 read_file	todo/list.rs	/^    pub(crate) fn read_file(file_path: &Path) -> Result<Self> {$/;"	P	implementation:TodoList
 remove	interfaces/cli/functions.rs	/^pub(crate) fn remove(preferences: Preferences, todos_file_path: PathBuf) -> Result<()> {$/;"	f
 run	interfaces/cli/body.rs	/^    pub(crate) fn run() -> Result<()> {$/;"	P	implementation:Cli
+scope_in_finish_command	interfaces/common/messages.rs	/^pub(crate) fn scope_in_finish_command(preferences: &Preferences) -> &'static str {$/;"	f
 select	interfaces/cli/functions.rs	/^fn select(preferences: &Preferences, todos: &[TodoEntry]) -> Result<usize> {$/;"	f
+selected_title	interfaces/common/messages.rs	/^pub(crate) fn selected_title(preferences: &Preferences) -> &'static str {$/;"	f
+separator	interfaces/common/messages.rs	/^macro_rules! separator {$/;"	M
 serach_repository_path	interfaces/cli/body.rs	/^    fn serach_repository_path() -> Result<PathBuf> {$/;"	P	implementation:Cli
+short_description_in_finish_command	interfaces/common/messages.rs	/^pub(crate) fn short_description_in_finish_command(preferences: &Preferences) -> &'static str {$/;"	f
 show	interfaces/cli/functions.rs	/^pub(crate) fn show(preferences: Preferences, todos_file_path: PathBuf) -> Result<()> {$/;"	f
 title	todo/entry.rs	/^    title: String,$/;"	m	struct:TodoEntry
-title_entry_head	interfaces/messages.rs	/^pub(super) fn title_entry_head(pointer: &str, idx: Option<usize>) -> String {$/;"	f
-title_in_add_command	interfaces/messages.rs	/^pub(super) fn title_in_add_command(preferences: &Preferences) -> &'static str {$/;"	f
+title_entry_head	interfaces/common/messages.rs	/^pub(crate) fn title_entry_head(pointer: &str, idx: Option<usize>) -> String {$/;"	f
+title_in_add_command	interfaces/common/messages.rs	/^pub(crate) fn title_in_add_command(preferences: &Preferences) -> &'static str {$/;"	f
 title_list_lines	interfaces/cli/functions.rs	/^fn title_list_lines(select_id: Option<usize>, todos: &[TodoEntry]) -> Result<Vec<String>> {$/;"	f
 todo	main.rs	/^mod todo;$/;"	n
-todo_entry_is_removed	interfaces/messages.rs	/^pub(super) fn todo_entry_is_removed(preferences: &Preferences) -> &'static str {$/;"	f
-todo_list_is_empty	interfaces/messages.rs	/^pub(super) fn todo_list_is_empty(preferences: &Preferences) -> &'static str {$/;"	f
+todo_entry_is_added	interfaces/common/messages.rs	/^pub(crate) fn todo_entry_is_added(preferences: &Preferences) -> &'static str {$/;"	f
+todo_entry_is_edited	interfaces/common/messages.rs	/^pub(crate) fn todo_entry_is_edited(preferences: &Preferences) -> &'static str {$/;"	f
+todo_entry_is_removed	interfaces/common/messages.rs	/^pub(crate) fn todo_entry_is_removed(preferences: &Preferences) -> &'static str {$/;"	f
+todo_list_is_empty	interfaces/common/messages.rs	/^pub(crate) fn todo_list_is_empty(preferences: &Preferences) -> &'static str {$/;"	f
 todos	todo/list.rs	/^    todos: Vec<TodoEntry>,$/;"	m	struct:TodoList
 updated_datetime	todo/entry.rs	/^    pub(crate) fn updated_datetime(&self) -> Result<String> {$/;"	P	implementation:TodoEntry
 updated_utc_datetime_rfc3339	todo/entry.rs	/^    updated_utc_datetime_rfc3339: String,$/;"	m	struct:TodoEntry
-whitespace_with_width	interfaces/messages.rs	/^pub(super) fn whitespace_with_width(width: usize) -> String {$/;"	f
+utilities	interfaces/common.rs	/^pub(super) mod utilities;$/;"	n
+whitespace_with_width	interfaces/common/messages.rs	/^pub(crate) fn whitespace_with_width(width: usize) -> String {$/;"	f
 write_file	todo/list.rs	/^    pub(crate) fn write_file(&self, file_path: &Path) -> Result<()> {$/;"	P	implementation:TodoList
 write_title_list	interfaces/cli/functions.rs	/^fn write_title_list($/;"	f

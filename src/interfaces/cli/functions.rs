@@ -1,8 +1,8 @@
 // Copyright (c) 2022 Yuichi Ishida <yu1guana@gmail.com>
 
-use crate::error::InterfaceError;
-use crate::interfaces::messages;
-use crate::interfaces::messages::SELECT_POINTER;
+use crate::error::{GitError, InterfaceError};
+use crate::interfaces::common::messages::SELECT_POINTER;
+use crate::interfaces::common::{messages, utilities};
 use crate::interfaces::preferences::Preferences;
 use crate::todo::{TodoEntry, TodoList};
 use anyhow::Result;
@@ -10,6 +10,7 @@ use chrono::Utc;
 use std::io;
 use std::io::{Stdout, Write};
 use std::path::PathBuf;
+use std::process::Command;
 use termion::clear;
 use termion::cursor;
 use termion::event::Key;
@@ -91,13 +92,73 @@ pub(crate) fn edit(preferences: Preferences, todos_file_path: PathBuf) -> Result
     Ok(())
 }
 
-pub(crate) fn finish(
-    _preferences: Preferences,
-    git_repository_path: PathBuf,
-    _todos_file_path: PathBuf,
-) -> Result<()> {
-    let _git_repository = git2::Repository::open(git_repository_path)?;
-    unimplemented!();
+pub(crate) fn finish(preferences: Preferences, todos_file_path: PathBuf) -> Result<()> {
+    if todos_file_path.is_file() {
+        let mut todo_list = TodoList::read_file(&todos_file_path)?;
+        if todo_list.todos().is_empty() {
+            println!("{}", messages::todo_list_is_empty(&preferences));
+        } else {
+            utilities::print_commit_message_format_with_box();
+            let target_id = select(&preferences, todo_list.todos())?;
+            let target_entry = todo_list.todos().get(target_id).unwrap();
+            let change_type =
+                one_line_reader(true, messages::change_type_in_finish_command(&preferences))?;
+            let scope = one_line_reader(false, messages::scope_in_finish_command(&preferences))?;
+            let short_description = one_line_reader(
+                false,
+                messages::short_description_in_finish_command(&preferences),
+            )?;
+            let short_description = if short_description.is_empty() {
+                target_entry.title().to_owned()
+            } else {
+                short_description
+            };
+            let long_description = one_line_reader(
+                false,
+                messages::long_description_in_finish_command(&preferences),
+            )?;
+            let long_description = if long_description.is_empty() {
+                target_entry.description().to_owned()
+            } else {
+                long_description
+            };
+            let commit_message = utilities::make_commit_message(
+                &change_type,
+                &scope,
+                &short_description,
+                &long_description,
+            );
+            utilities::print_commit_message_with_box("Commit message", &commit_message);
+            if confirm(&preferences)? {
+                let _ = todo_list.todos_mut().remove(target_id);
+                todo_list.write_file(&todos_file_path)?;
+                let output_git_add = Command::new("git")
+                    .arg("add")
+                    .arg(todos_file_path)
+                    .output()
+                    .expect("failed to execute `git add`");
+                if !output_git_add.status.success() {
+                    io::stderr().write_all(&output_git_add.stdout).unwrap();
+                    io::stderr().write_all(&output_git_add.stderr).unwrap();
+                    return Err(GitError::GitAdd.into());
+                }
+                let output_git_commit = Command::new("git")
+                    .arg("commit")
+                    .arg("-m")
+                    .arg(commit_message)
+                    .output()
+                    .expect("failed to execute `git commit`");
+                if !output_git_commit.status.success() {
+                    io::stderr().write_all(&output_git_commit.stdout).unwrap();
+                    io::stderr().write_all(&output_git_commit.stderr).unwrap();
+                    return Err(GitError::GitCommit.into());
+                }
+                println!("{}", messages::commit_is_done(&preferences),);
+            }
+        }
+    } else {
+        println!("{}", messages::no_todo_list(&preferences));
+    }
     Ok(())
 }
 

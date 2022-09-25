@@ -1,8 +1,8 @@
 // Copyright (c) 2022 Yuichi Ishida <yu1guana@gmail.com>
 
 use super::functions;
-use crate::error::InterfaceError;
-use crate::interfaces::names;
+use crate::error::GitError;
+use crate::interfaces::common::names;
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 use std::env;
@@ -45,7 +45,7 @@ impl Cli {
             Action::List => functions::list(preferences, todos_file_path),
             Action::Add => functions::add(preferences, todos_file_path),
             Action::Edit => functions::edit(preferences, todos_file_path),
-            Action::Finish => functions::finish(preferences, git_repository_path, todos_file_path),
+            Action::Finish => functions::finish(preferences, todos_file_path),
             Action::Remove => functions::remove(preferences, todos_file_path),
             Action::Show => functions::show(preferences, todos_file_path),
         }
@@ -61,6 +61,6 @@ impl Cli {
             }
             dir = parent_dir.to_path_buf();
         }
-        Err(InterfaceError::NotGitRepository.into())
+        Err(GitError::NotGitRepository.into())
     }
 }
