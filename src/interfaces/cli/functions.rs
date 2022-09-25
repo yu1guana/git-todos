@@ -43,7 +43,9 @@ pub(crate) fn add(preferences: Preferences, todos_file_path: PathBuf) -> Result<
         TodoList::new()
     };
     todo_list.push(todo_entry);
-    todo_list.write_file(&todos_file_path)
+    todo_list.write_file(&todos_file_path)?;
+    println!("{}", messages::todo_entry_is_added(&preferences));
+    Ok(())
 }
 
 pub(crate) fn remove(preferences: Preferences, todos_file_path: PathBuf) -> Result<()> {
@@ -53,10 +55,11 @@ pub(crate) fn remove(preferences: Preferences, todos_file_path: PathBuf) -> Resu
             println!("{}", messages::todo_list_is_empty(&preferences));
         } else {
             let remove_id = select(&preferences, todo_list.todos())?;
-            let removed_todo_entry = todo_list.todos_mut().remove(remove_id);
-            todo_list.write_file(&todos_file_path)?;
-            println!("{}", messages::todo_entry_is_removed(&preferences),);
-            println!("{}", removed_todo_entry.title());
+            if confirm(&preferences)? {
+                let _ = todo_list.todos_mut().remove(remove_id);
+                todo_list.write_file(&todos_file_path)?;
+                println!("{}", messages::todo_entry_is_removed(&preferences),);
+            }
         }
     } else {
         println!("{}", messages::no_todo_list(&preferences));
@@ -71,15 +74,16 @@ pub(crate) fn edit(preferences: Preferences, todos_file_path: PathBuf) -> Result
             println!("{}", messages::todo_list_is_empty(&preferences));
         } else {
             let target_id = select(&preferences, todo_list.todos())?;
-            let mut target_todo_entry = todo_list.todos_mut().remove(target_id);
-            println!("{}", target_todo_entry.title());
-            target_todo_entry.set_description(one_line_reader(
-                false,
-                messages::description_in_add_command(&preferences),
-            )?);
-            target_todo_entry.set_updated_utc_datetime_rfc3339(Utc::now().to_rfc3339());
-            todo_list.push(target_todo_entry);
-            todo_list.write_file(&todos_file_path)?;
+            let new_description =
+                one_line_reader(false, messages::description_in_add_command(&preferences))?;
+            if confirm(&preferences)? {
+                let mut target_todo_entry = todo_list.todos_mut().remove(target_id);
+                target_todo_entry.set_description(new_description);
+                target_todo_entry.set_updated_utc_datetime_rfc3339(Utc::now().to_rfc3339());
+                todo_list.push(target_todo_entry);
+                todo_list.write_file(&todos_file_path)?;
+                println!("{}", messages::todo_entry_is_edited(&preferences),);
+            }
         }
     } else {
         println!("{}", messages::no_todo_list(&preferences));
@@ -105,12 +109,20 @@ pub(crate) fn show(preferences: Preferences, todos_file_path: PathBuf) -> Result
         } else {
             let target_id = select(&preferences, todo_list.todos())?;
             let target_entry = todo_list.todos().get(target_id).unwrap();
+            let updated_datetime = match target_entry.updated_datetime() {
+                Ok(x) => x,
+                Err(err) => format!(" failed to get updated datetime: {:?}", err),
+            };
             println!(
-                "[{}] {}",
-                target_entry.title(),
-                target_entry.updated_datetime()?
+                "{}{}",
+                messages::last_update(&preferences),
+                updated_datetime
             );
-            println!("{}", target_entry.description());
+            println!(
+                "{}{}",
+                messages::description(&preferences),
+                target_entry.description()
+            );
         }
     } else {
         println!("{}", messages::no_todo_list(&preferences));
@@ -170,6 +182,65 @@ fn one_line_reader(necessary: bool, prompt_message: &str) -> Result<String> {
     Ok(s)
 }
 
+fn confirm(preferences: &Preferences) -> Result<bool> {
+    let stdin = io::stdin();
+    let mut stdout = io::stdout().into_raw_mode()?;
+    let mut flag = false;
+    let mut s = String::new();
+    let prompt_message = messages::comfirmation_prompt(preferences);
+    let prompt_message_width = prompt_message.width_cjk() as u16;
+    write!(stdout, "{}", prompt_message)?;
+    stdout.flush()?;
+    for key in stdin.keys() {
+        match key {
+            Ok(Key::Char('\n')) => {
+                if !s.is_empty() {
+                    writeln!(stdout)?;
+                    write!(
+                        stdout,
+                        "{}",
+                        cursor::Left(prompt_message_width + s.as_str().width_cjk() as u16)
+                    )?;
+                    stdout.flush()?;
+                    match s.as_str() {
+                        "y" => flag = true,
+                        "n" => flag = false,
+                        _ => unreachable!(),
+                    }
+                    break;
+                }
+            }
+            Ok(Key::Char(c)) => {
+                if s.is_empty() && (c == 'y' || c == 'n') {
+                    write!(stdout, "{}", clear::CurrentLine)?;
+                    write!(
+                        stdout,
+                        "{}",
+                        cursor::Left(prompt_message_width + s.as_str().width_cjk() as u16)
+                    )?;
+                    s.push(c);
+                    write!(stdout, "{}{}", prompt_message, s)?;
+                    stdout.flush()?;
+                }
+            }
+            Ok(Key::Backspace) => {
+                write!(stdout, "{}", clear::CurrentLine)?;
+                write!(
+                    stdout,
+                    "{}",
+                    cursor::Left(prompt_message_width + s.as_str().width_cjk() as u16)
+                )?;
+                s.pop();
+                write!(stdout, "{}{}", prompt_message, s)?;
+                stdout.flush()?;
+            }
+            Ok(Key::Ctrl('c')) => return Err(InterfaceError::KeyboardInterrupted.into()),
+            _ => {}
+        }
+    }
+    Ok(flag)
+}
+
 fn select(preferences: &Preferences, todos: &[TodoEntry]) -> Result<usize> {
     let terminal_size = termion::terminal_size()?;
     let mut select_id = 0;
@@ -211,8 +282,16 @@ fn select(preferences: &Preferences, todos: &[TodoEntry]) -> Result<usize> {
         clear_upper_lines(&mut stdout, num_row)?;
         write_title_list(&mut stdout, Some(select_id), todos)?;
     }
-    write!(stdout, "{}", cursor::Show)?;
     clear_upper_lines(&mut stdout, num_row + 1)?;
+    write!(
+        stdout,
+        "{}{}",
+        messages::selected_title(preferences),
+        todos.get(select_id).unwrap().title()
+    )?;
+    writeln!(stdout)?;
+    write!(stdout, "{}", cursor::Left(u16::MAX))?;
+    write!(stdout, "{}", cursor::Show)?;
     stdout.flush()?;
     Ok(select_id)
 }

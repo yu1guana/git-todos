@@ -9,6 +9,12 @@ macro_rules! prompt {
     };
 }
 
+macro_rules! separator {
+    () => {
+        ": "
+    };
+}
+
 pub(super) const SELECT_POINTER: &str = "*";
 
 pub(super) fn whitespace_with_width(width: usize) -> String {
@@ -29,10 +35,24 @@ pub(super) fn no_todo_list(preferences: &Preferences) -> &'static str {
     }
 }
 
+pub(super) fn todo_entry_is_added(preferences: &Preferences) -> &'static str {
+    match preferences.language() {
+        Language::English => "A todo is added",
+        Language::Japanese => "TODOが追加されました",
+    }
+}
+
 pub(super) fn todo_entry_is_removed(preferences: &Preferences) -> &'static str {
     match preferences.language() {
-        Language::English => "The following todos are removed:",
-        Language::Japanese => "以下のTODOが削除されました:",
+        Language::English => "The selected todo is removed",
+        Language::Japanese => "選択されたTODOが削除されました",
+    }
+}
+
+pub(super) fn todo_entry_is_edited(preferences: &Preferences) -> &'static str {
+    match preferences.language() {
+        Language::English => "The selected todo is edited",
+        Language::Japanese => "選択されたTODOが編集されました",
     }
 }
 
@@ -61,5 +81,33 @@ pub(super) fn description_in_add_command(preferences: &Preferences) -> &'static 
     match preferences.language() {
         Language::English => concat!("Description ", prompt!()),
         Language::Japanese => concat!("説明 ", prompt!()),
+    }
+}
+
+pub(super) fn selected_title(preferences: &Preferences) -> &'static str {
+    match preferences.language() {
+        Language::English => concat!("Selected To-Do", separator!()),
+        Language::Japanese => concat!("選択されたTODO", separator!()),
+    }
+}
+
+pub(super) fn last_update(preferences: &Preferences) -> &'static str {
+    match preferences.language() {
+        Language::English => concat!("last updated datetime", separator!()),
+        Language::Japanese => concat!("最終更新時刻", separator!()),
+    }
+}
+
+pub(super) fn description(preferences: &Preferences) -> &'static str {
+    match preferences.language() {
+        Language::English => concat!("description", separator!()),
+        Language::Japanese => concat!("説明", separator!()),
+    }
+}
+
+pub(super) fn comfirmation_prompt(preferences: &Preferences) -> &'static str {
+    match preferences.language() {
+        Language::English => concat!("Are you sure [y/n]? ", prompt!()),
+        Language::Japanese => concat!("実行しますか [y/n]？ ", prompt!()),
     }
 }
