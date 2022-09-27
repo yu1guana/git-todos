@@ -1,1 +1,4 @@
-todos = []
+[[todos]]
+title = "improve one_line_reader"
+description = "Left and right arrow keys can be utilized in one_line_reader"
+updated_utc_datetime_rfc3339 = "2022-09-27T13:42:01.635864+00:00"

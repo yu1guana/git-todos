@@ -13,7 +13,7 @@ use std::path::PathBuf;
     name = env!("CARGO_PKG_NAME"),
     author = env!("CARGO_PKG_AUTHORS"),
     version = env!("CARGO_PKG_VERSION"),
-    about = ""
+    about = "A Git based Todos App"
 )]
 pub(crate) struct Cli {
     #[clap(subcommand)]
@@ -26,7 +26,7 @@ enum Action {
     Add,
     #[clap(about = "Edit a Todo")]
     Edit,
-    #[clap(about = "(UNIMPLEMENTED!) Fnish a Todo and commit stated changes")]
+    #[clap(about = "Fnish a Todo and commit stated changes")]
     Finish,
     #[clap(about = "List available Todos")]
     List,
