@@ -1,10 +1,20 @@
 [package]
 name = "git-todos"
+authors = ["Yuichi Ishida <yu1guana@gmail.com>"]
 version = "0.1.0"
+description = "A Git based Todos App"
+repository = "https://github.com/yu1guana/git-todos"
+license-file = "LICENSE"
+readme = "README.md"
 edition = "2021"
 publish = false
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[profile.release]
+lto = true
+panic = 'abort'
+codegen-units = 1
 
 [dependencies]
 anyhow = "1.0"

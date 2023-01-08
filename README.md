@@ -14,23 +14,25 @@ cargo install --path .
 ## Usage
 
 ```sh
-git-todos 0.1.0
-
-A Git based Todos App
-
 USAGE:
-    git-todos <SUBCOMMAND>
+  git-todos <SUBCOMMAND>
 
 OPTIONS:
-    -h, --help       Print help information
-    -V, --version    Print version information
+  -h, --help       Print help information
+  -V, --version    Print version information
 
 SUBCOMMANDS:
-    add       Add a new Todo
-    edit      Edit a Todo
-    finish    Fnish a Todo and commit stated changes
-    help      Print this message or the help of the given subcommand(s)
-    list      List available Todos
-    remove    Remove existing Todo
-    show      Show Todo details
+  add       Add a new Todo
+  edit      Edit a Todo
+  finish    Fnish a Todo and commit stated changes
+  help      Print this message or the help of the given subcommand(s)
+  list      List available Todos
+  remove    Remove existing Todo
+  show      Show Todo details
 ```
+
+## License
+
+Copyright (c) 2023 Yuichi Ishida
+Released under the MIT license
+[https://opensource.org/licenses/mit-license.php](https://opensource.org/licenses/mit-license.php)

@@ -1,4 +1,7 @@
-// Copyright (c) 2022 Yuichi Ishida <yu1guana@gmail.com>
+// Copyright (c) 2023 Yuichi Ishida <yu1guana@gmail.com>
+//
+// Released under the MIT license.
+// see https://opensource.org/licenses/mit-license.php
 
 #[derive(thiserror::Error, Debug)]
 pub(crate) enum InterfaceError {
