@@ -12,12 +12,7 @@ use std::env;
 use std::path::PathBuf;
 
 #[derive(Parser)]
-#[clap(
-    name = env!("CARGO_PKG_NAME"),
-    author = env!("CARGO_PKG_AUTHORS"),
-    version = env!("CARGO_PKG_VERSION"),
-    about = "A Git based Todos App"
-)]
+#[clap(author, version, about, after_help = concat!("Repository: ", env!("CARGO_PKG_REPOSITORY")))]
 pub(crate) struct Cli {
     #[clap(subcommand)]
     action: Action,
@@ -25,18 +20,18 @@ pub(crate) struct Cli {
 
 #[derive(Subcommand)]
 enum Action {
+    #[clap(about = "List available Todos")]
+    List,
+    #[clap(about = "Show Todo details")]
+    Show,
     #[clap(about = "Add a new Todo")]
     Add,
     #[clap(about = "Edit a Todo")]
     Edit,
     #[clap(about = "Fnish a Todo and commit stated changes")]
     Finish,
-    #[clap(about = "List available Todos")]
-    List,
     #[clap(about = "Remove existing Todo")]
     Remove,
-    #[clap(about = "Show Todo details")]
-    Show,
 }
 
 impl Cli {
