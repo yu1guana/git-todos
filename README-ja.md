@@ -13,7 +13,7 @@ cargo install --path .
 
 ## 使い方
 
-```sh
+```
 Usage: git todos <COMMAND>
 
 Commands:
@@ -32,6 +32,6 @@ Options:
 
 ## License
 
-Copyright (c) 2023 Yuichi Ishida
-Released under the MIT license
+Copyright (c) 2023 Yuichi Ishida  
+Released under the MIT license  
 [https://opensource.org/licenses/mit-license.php](https://opensource.org/licenses/mit-license.php)
