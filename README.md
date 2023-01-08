@@ -1,4 +1,4 @@
-# todos
+# git-todos
 
 A Git based Todos App.
 This is a program written by Rust and provides similar functions to [z0al/git-todos](https://github.com/z0al/git-todos).
@@ -14,21 +14,20 @@ cargo install --path .
 ## Usage
 
 ```sh
-USAGE:
-  git-todos <SUBCOMMAND>
+Usage: git todos <COMMAND>
 
-OPTIONS:
-  -h, --help       Print help information
-  -V, --version    Print version information
+Commands:
+  list    List available Todos
+  show    Show Todo details
+  add     Add a new Todo
+  edit    Edit a Todo
+  finish  Fnish a Todo and commit stated changes
+  remove  Remove existing Todo
+  help    Print this message or the help of the given subcommand(s)
 
-SUBCOMMANDS:
-  add       Add a new Todo
-  edit      Edit a Todo
-  finish    Fnish a Todo and commit stated changes
-  help      Print this message or the help of the given subcommand(s)
-  list      List available Todos
-  remove    Remove existing Todo
-  show      Show Todo details
+Options:
+  -h, --help     Print help information
+  -V, --version  Print version information
 ```
 
 ## License

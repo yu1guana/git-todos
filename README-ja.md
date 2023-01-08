@@ -1,4 +1,4 @@
-# todos
+# git-todos
 
 A Git based Todos App.
 これはRustで書かれたプログラムで、[z0al/git-todos](https://github.com/z0al/git-todos)と似たような機能を提供します。
@@ -14,23 +14,24 @@ cargo install --path .
 ## 使い方
 
 ```sh
-git-todos 0.1.0
+Usage: git todos <COMMAND>
 
-A Git based Todos App
+Commands:
+  list    List available Todos
+  show    Show Todo details
+  add     Add a new Todo
+  edit    Edit a Todo
+  finish  Fnish a Todo and commit stated changes
+  remove  Remove existing Todo
+  help    Print this message or the help of the given subcommand(s)
 
-USAGE:
-    git-todos <SUBCOMMAND>
-
-OPTIONS:
-    -h, --help       Print help information
-    -V, --version    Print version information
-
-SUBCOMMANDS:
-    add       Add a new Todo
-    edit      Edit a Todo
-    finish    Fnish a Todo and commit stated changes
-    help      Print this message or the help of the given subcommand(s)
-    list      List available Todos
-    remove    Remove existing Todo
-    show      Show Todo details
+Options:
+  -h, --help     Print help information
+  -V, --version  Print version information
 ```
+
+## License
+
+Copyright (c) 2023 Yuichi Ishida
+Released under the MIT license
+[https://opensource.org/licenses/mit-license.php](https://opensource.org/licenses/mit-license.php)
