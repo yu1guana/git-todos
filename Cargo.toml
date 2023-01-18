@@ -1,7 +1,7 @@
 [package]
 name = "git-todos"
 authors = ["Yuichi Ishida <yu1guana@gmail.com>"]
-version = "0.1.0"
+version = "0.1.1"
 description = "A Git based Todos App"
 repository = "https://github.com/yu1guana/git-todos"
 license-file = "LICENSE"
